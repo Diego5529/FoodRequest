@@ -58,4 +58,38 @@ public class DBController {
 
         return cursor;
     }
+
+    public Cursor carregaDadoById(int id){
+        Cursor cursor;
+
+        String[] campos =  {banco.ID_PRODUTO, banco.NOME_PRODUTO, banco.PRECO_PRODUTO};
+
+        String where = CreateDB.ID_PRODUTO + "=" + id;
+        db = banco.getReadableDatabase();
+        cursor = db.query(CreateDB.TABELA_PRODUTOS, campos, where, null, null, null, null, null);
+
+        if (!cursor.moveToFirst())
+            cursor = null;
+
+        return cursor;
+    }
+
+    public void alteraRegistro(int id, String nome, String preco){
+        ContentValues valores;
+        String where;
+        db = banco.getWritableDatabase();
+
+        where = CreateDB.ID_PRODUTO + "=" + id;
+
+        valores = new ContentValues();
+        valores.put(banco.NOME_PRODUTO, nome);
+        valores.put(banco.PRECO_PRODUTO, preco);
+        db.update(CreateDB.TABELA_PRODUTOS, valores, where, null);
+    }
+
+    public void deletaRegistro(int id){
+        String where = CreateDB.ID_PRODUTO + "=" + id;
+        db = banco.getReadableDatabase();
+        db.delete(CreateDB.TABELA_PRODUTOS, where, null);
+    }
 }

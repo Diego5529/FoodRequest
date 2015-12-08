@@ -8,8 +8,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
+import android.widget.Toast;
+import android.database.Cursor;
 
 public class MainActivity extends AppCompatActivity {
+
+    EditText edtID;
+    EditText edtNome;
+    EditText edtPreco;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,14 +25,66 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        edtID = (EditText) findViewById(R.id.editTextID);
+        edtNome = (EditText) findViewById(R.id.editTextNome);
+        edtPreco = (EditText) findViewById(R.id.editTextPreco);
+    }
+
+    public void gravarProduto(View view) {
+        DBController crud = new DBController(getBaseContext());
+        String nome = edtNome.getText().toString();
+        String preco = edtPreco.getText().toString();
+        String resultado;
+        resultado = crud.insereDado(nome, preco);
+        Toast.makeText(getApplicationContext(), resultado, Toast.LENGTH_LONG).show();
+        edtNome.setText("");
+        edtPreco.setText("");
+    }
+
+    public void buscarProduto(View view) {
+        DBController crud = new DBController(getBaseContext());
+
+        int id = Integer.parseInt(edtID.getText().toString());
+        Cursor cursor;
+        cursor = crud.carregaDadoById(id);
+
+        if (cursor != null) {
+            String nome = cursor.getString(1); // nome
+            String preco = cursor.getString(2);
+
+            edtNome.setText(nome);
+            edtPreco.setText(preco);
+        } else {
+            Toast.makeText(getApplicationContext(), "Produto não encontrado!", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void excluirProduto(View view) {
+        DBController crud = new DBController(getBaseContext());
+        int id = Integer.parseInt(edtID.getText().toString());
+        crud.deletaRegistro(id);
+        edtID.setText("");
+        edtNome.setText("");
+        edtPreco.setText("");
+        Toast.makeText(getApplicationContext(), "Registro excluido!", Toast.LENGTH_LONG).show();
+    }
+
+    public void alterarProduto(View view) {
+        DBController crud = new DBController(getBaseContext());
+        int id = Integer.parseInt(edtID.getText().toString());
+        String nome = edtNome.getText().toString();
+        String preco = edtPreco.getText().toString();
+        crud.alteraRegistro(id, nome, preco);
+        Toast.makeText(getApplicationContext(), "Registro alterado!", Toast.LENGTH_LONG).show();
+        edtID.setText("");
+        edtNome.setText("");
+        edtPreco.setText("");
+    }
+
+    public void limparCampos(View view) {
+        edtID.setText("");
+        edtNome.setText("");
+        edtPreco.setText("");
     }
 
     @Override
