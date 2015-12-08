@@ -32,19 +32,32 @@ public class MainActivity extends AppCompatActivity {
 
     public void gravarProduto(View view) {
         DBController crud = new DBController(getBaseContext());
-        String nome = edtNome.getText().toString();
-        String preco = edtPreco.getText().toString();
-        String resultado;
-        resultado = crud.insereDado(nome, preco);
-        Toast.makeText(getApplicationContext(), resultado, Toast.LENGTH_LONG).show();
-        edtNome.setText("");
-        edtPreco.setText("");
+
+        String nome = "";
+        if (edtNome.getText().length() > 0)
+            nome = edtNome.getText().toString();
+
+        String preco = "";
+        if (edtPreco.getText().length() > 0)
+            preco = edtPreco.getText().toString();
+
+        if (nome.length() > 0 && preco.length() > 0) {
+            String resultado;
+            resultado = crud.insereDado(nome, preco);
+            Toast.makeText(getApplicationContext(), resultado, Toast.LENGTH_LONG).show();
+            limparCampos();
+        }else {
+            Toast.makeText(getApplicationContext(), "Preencha corretamento o campo nome e preço antes de gravar!", Toast.LENGTH_LONG).show();
+        }
     }
 
     public void buscarProduto(View view) {
         DBController crud = new DBController(getBaseContext());
 
-        int id = Integer.parseInt(edtID.getText().toString());
+        int id = 0;
+        if (edtID.getText().length() > 0)
+            id = Integer.parseInt(edtID.getText().toString());
+
         Cursor cursor;
         cursor = crud.carregaDadoById(id);
 
@@ -61,27 +74,45 @@ public class MainActivity extends AppCompatActivity {
 
     public void excluirProduto(View view) {
         DBController crud = new DBController(getBaseContext());
-        int id = Integer.parseInt(edtID.getText().toString());
-        crud.deletaRegistro(id);
-        edtID.setText("");
-        edtNome.setText("");
-        edtPreco.setText("");
-        Toast.makeText(getApplicationContext(), "Registro excluido!", Toast.LENGTH_LONG).show();
+
+        int id = 0;
+        if (edtID.getText().length() > 0)
+            id = Integer.parseInt(edtID.getText().toString());
+
+        if (id > 0) {
+            crud.deletaRegistro(id);
+            limparCampos();
+            Toast.makeText(getApplicationContext(), "Registro excluido!", Toast.LENGTH_LONG).show();
+        }else {
+            Toast.makeText(getApplicationContext(), "Insira um ID de produto para ser excluido!", Toast.LENGTH_LONG).show();
+        }
     }
 
     public void alterarProduto(View view) {
         DBController crud = new DBController(getBaseContext());
-        int id = Integer.parseInt(edtID.getText().toString());
-        String nome = edtNome.getText().toString();
-        String preco = edtPreco.getText().toString();
-        crud.alteraRegistro(id, nome, preco);
-        Toast.makeText(getApplicationContext(), "Registro alterado!", Toast.LENGTH_LONG).show();
-        edtID.setText("");
-        edtNome.setText("");
-        edtPreco.setText("");
+
+        int id = 0;
+        if (edtID.getText().length() > 0)
+            id = Integer.parseInt(edtID.getText().toString());
+
+        String nome = "";
+        if (edtNome.getText().length() > 0)
+            nome = edtNome.getText().toString();
+
+        String preco = "";
+        if (edtPreco.getText().length() > 0)
+            preco = edtPreco.getText().toString();
+
+        if (id > 0 && nome.length() > 0 && preco.length() > 0) {
+            crud.alteraRegistro(id, nome, preco);
+            Toast.makeText(getApplicationContext(), "Registro alterado!", Toast.LENGTH_LONG).show();
+            limparCampos();
+        }else {
+            Toast.makeText(getApplicationContext(), "Todos os campos precisam estar preenchidos!", Toast.LENGTH_LONG).show();
+        }
     }
 
-    public void limparCampos(View view) {
+    public void limparCampos() {
         edtID.setText("");
         edtNome.setText("");
         edtPreco.setText("");

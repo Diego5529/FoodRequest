@@ -7,4 +7,9 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/action_cadastra_pedido"
+        android:orderInCategory="100"
+        android:title="Cadastrar Produtos"
+        app:showAsAction="never" />
 </menu>
