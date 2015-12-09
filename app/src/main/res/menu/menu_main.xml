@@ -2,14 +2,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="foodrequest.edu.ifsp.bri.foodrequest.MainActivity">
+
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_cadastra_produtos"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="Cadastrar Produtos"
         app:showAsAction="never" />
     <item
         android:id="@+id/action_cadastra_pedido"
         android:orderInCategory="100"
-        android:title="Cadastrar Produtos"
+        android:title="Cadastrar Pedidos"
         app:showAsAction="never" />
 </menu>

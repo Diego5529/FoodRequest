@@ -1,5 +1,6 @@
 package foodrequest.edu.ifsp.bri.foodrequest;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,15 +9,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 import android.database.Cursor;
+import android.widget.AdapterView.OnItemClickListener;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
-    EditText edtID;
-    EditText edtNome;
-    EditText edtPreco;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,97 +28,73 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        edtID = (EditText) findViewById(R.id.editTextID);
-        edtNome = (EditText) findViewById(R.id.editTextNome);
-        edtPreco = (EditText) findViewById(R.id.editTextPreco);
+        carregaLista();
     }
 
-    public void gravarProduto(View view) {
-        DBController crud = new DBController(getBaseContext());
+    public void carregaLista(){
+        final ListView lista = (ListView) findViewById(R.id.listViewPedidos);
 
-        String nome = "";
-        if (edtNome.getText().length() > 0)
-            nome = edtNome.getText().toString();
+        final ArrayList<String> equpes = preencheDados();
 
-        String preco = "";
-        if (edtPreco.getText().length() > 0)
-            preco = edtPreco.getText().toString();
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, equpes);
 
-        if (nome.length() > 0 && preco.length() > 0) {
-            String resultado;
-            resultado = crud.insereDado(nome, preco);
-            Toast.makeText(getApplicationContext(), resultado, Toast.LENGTH_LONG).show();
-            limparCampos();
-        }else {
-            Toast.makeText(getApplicationContext(), "Preencha corretamento o campo nome e preço antes de gravar!", Toast.LENGTH_LONG).show();
+        lista.setAdapter(arrayAdapter);
+
+        lista.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Intent i = new Intent(ClassName.this,CourtDetailActivity.class);
+                //startActivity(i);
+                Toast.makeText(getApplicationContext(), "Pedido:" + equpes.get(position).toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    protected void  onResume(Bundle saveInstanceState){
+        carregaLista();
+        Toast.makeText(getApplicationContext(), "on resume!", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (resultCode == RESULT_OK) {
+
+            //Fazer o que pretende quando retorna do Voice
         }
+        if (requestCode == 0 && resultCode == RESULT_OK) {
+            //Fazer o que pretende quando retorna do Bluetooth
+        }
+
+        carregaLista();
+        Toast.makeText(getApplicationContext(), "on result!", Toast.LENGTH_LONG).show();
     }
 
-    public void buscarProduto(View view) {
-        DBController crud = new DBController(getBaseContext());
+    private ArrayList<String> preencheDados(){
+        ArrayList<Pedido> dados = new ArrayList<Pedido>();
+        ArrayList<String> arrayRetorno = new ArrayList<String>();
 
-        int id = 0;
-        if (edtID.getText().length() > 0)
-            id = Integer.parseInt(edtID.getText().toString());
+        DBController crud = new DBController(getBaseContext());
 
         Cursor cursor;
-        cursor = crud.carregaDadoById(id);
+        dados = crud.listAllPedidos();
 
-        if (cursor != null) {
-            String nome = cursor.getString(1); // nome
-            String preco = cursor.getString(2);
+        if (dados.size() > 0){
+            for (Pedido pedido : dados) {
+                String idPed = String.valueOf(pedido.getIdPedido());
+                String precoProduto = String.valueOf(pedido.getPreco());
+                String qtde = String.valueOf(pedido.getQuantidade());
+                String ttl = String.valueOf(pedido.getTotal());
+                String mes = String.valueOf(pedido.getMesa());
 
-            edtNome.setText(nome);
-            edtPreco.setText(preco);
+                String stringPedido = "Ped: " + idPed + " / Preço: " + precoProduto + " Qtde: " + qtde + "Total: " + ttl;
+
+                arrayRetorno.add(stringPedido);
+            }
         } else {
-            Toast.makeText(getApplicationContext(), "Produto não encontrado!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Nenhum Pedido foi encontrado!", Toast.LENGTH_LONG).show();
         }
-    }
 
-    public void excluirProduto(View view) {
-        DBController crud = new DBController(getBaseContext());
-
-        int id = 0;
-        if (edtID.getText().length() > 0)
-            id = Integer.parseInt(edtID.getText().toString());
-
-        if (id > 0) {
-            crud.deletaRegistro(id);
-            limparCampos();
-            Toast.makeText(getApplicationContext(), "Registro excluido!", Toast.LENGTH_LONG).show();
-        }else {
-            Toast.makeText(getApplicationContext(), "Insira um ID de produto para ser excluido!", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    public void alterarProduto(View view) {
-        DBController crud = new DBController(getBaseContext());
-
-        int id = 0;
-        if (edtID.getText().length() > 0)
-            id = Integer.parseInt(edtID.getText().toString());
-
-        String nome = "";
-        if (edtNome.getText().length() > 0)
-            nome = edtNome.getText().toString();
-
-        String preco = "";
-        if (edtPreco.getText().length() > 0)
-            preco = edtPreco.getText().toString();
-
-        if (id > 0 && nome.length() > 0 && preco.length() > 0) {
-            crud.alteraRegistro(id, nome, preco);
-            Toast.makeText(getApplicationContext(), "Registro alterado!", Toast.LENGTH_LONG).show();
-            limparCampos();
-        }else {
-            Toast.makeText(getApplicationContext(), "Todos os campos precisam estar preenchidos!", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    public void limparCampos() {
-        edtID.setText("");
-        edtNome.setText("");
-        edtPreco.setText("");
+        return arrayRetorno;
     }
 
     @Override
@@ -133,8 +112,10 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_cadastra_produtos){
+            startActivity(new Intent(MainActivity.this, CadastroProdutoActivity.class));
+        }else if (id == R.id.action_cadastra_pedido){
+            startActivity(new Intent(MainActivity.this, CadastroPedidoActivity.class));
         }
 
         return super.onOptionsItemSelected(item);

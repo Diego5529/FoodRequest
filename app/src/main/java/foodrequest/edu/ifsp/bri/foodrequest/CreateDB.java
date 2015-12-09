@@ -20,7 +20,7 @@ public class CreateDB extends SQLiteOpenHelper{
 
     //Pedidos
     protected static final String TABELA_PEDIDOS = "pedidos";
-    protected static final String ID_PEDIDO = "_id";
+    protected static final String ID_PEDIDO = "id_pedido";
     protected static final String ID_PRODUTO_PEDIDO = "id_prod";
     protected static final String QUANTIDADE = "quantidade";
     protected static final String PRECO_PEDIDO = "preco_pedido";
@@ -35,10 +35,30 @@ public class CreateDB extends SQLiteOpenHelper{
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        createTableProdutos(db);
+        createTablePedidos(db);
+    }
+
+    public void createTableProdutos(SQLiteDatabase db){
         String sql = "CREATE TABLE "+TABELA_PRODUTOS+"("
                 + ID_PRODUTO + " integer primary key autoincrement,"
                 + NOME_PRODUTO + " text,"
-                + PRECO_PRODUTO + " text"
+                + PRECO_PRODUTO + " decimal(10,5)"
+                +")";
+
+        db.execSQL(sql);
+    }
+
+    public void createTablePedidos(SQLiteDatabase db){
+        //Cadastro de Pedidos (id, id_prod, quantidade, preço, total, mesa) – com inclusão, consulta
+
+        String sql = "CREATE TABLE "+TABELA_PEDIDOS+"("
+                + ID_PEDIDO + " integer primary key autoincrement,"
+                + ID_PRODUTO_PEDIDO + " integer,"
+                + QUANTIDADE + " integer,"
+                + PRECO_PEDIDO + " decimal(10,5),"
+                + TOTAL + " decimal(10,5),"
+                + MESA + " integer"
                 +")";
 
         db.execSQL(sql);
@@ -47,6 +67,8 @@ public class CreateDB extends SQLiteOpenHelper{
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS" + TABELA_PRODUTOS);
+        db.execSQL("DROP TABLE IF EXISTS" + TABELA_PEDIDOS);
+
         onCreate(db);
     }
 }
