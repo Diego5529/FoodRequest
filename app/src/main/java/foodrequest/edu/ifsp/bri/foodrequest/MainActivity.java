@@ -1,5 +1,6 @@
 package foodrequest.edu.ifsp.bri.foodrequest;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,6 +9,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.Toast;
+import android.database.Cursor;
+import android.widget.AdapterView.OnItemClickListener;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,14 +28,86 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+        carregaLista();
+    }
+
+    public void carregaLista(){
+        final ListView lista = (ListView) findViewById(R.id.listViewPedidos);
+
+        final ArrayList<String> equpes = preencheDados();
+
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, equpes);
+
+        lista.setAdapter(arrayAdapter);
+
+        lista.setOnItemClickListener(new OnItemClickListener() {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                id = id + 1;
+                if (id > 0) {
+                    String stringID = String.valueOf(id);
+                    Intent intent = new Intent(MainActivity.this, CadastroPedidoActivity.class);
+                    Bundle b = new Bundle();
+                    b.putInt("id_pedido", Integer.parseInt(stringID));
+                    intent.putExtras(b);
+
+                    startActivity(intent);
+                }
+
+                Toast.makeText(getApplicationContext(), "Pedido:" + equpes.get(position).toString(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void reloadListView(View view){
+        carregaLista();
+    }
+
+    protected void  onResume(Bundle saveInstanceState){
+        carregaLista();
+        Toast.makeText(getApplicationContext(), "on resume!", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (resultCode == RESULT_OK) {
+
+            //Fazer o que pretende quando retorna do Voice
+        }
+        if (requestCode == 0 && resultCode == RESULT_OK) {
+            //Fazer o que pretende quando retorna do Bluetooth
+        }
+
+        carregaLista();
+        Toast.makeText(getApplicationContext(), "on result!", Toast.LENGTH_LONG).show();
+    }
+
+    private ArrayList<String> preencheDados(){
+        ArrayList<Pedido> dados = new ArrayList<Pedido>();
+        ArrayList<String> arrayRetorno = new ArrayList<String>();
+
+        DBController crud = new DBController(getBaseContext());
+
+        Cursor cursor;
+        dados = crud.listAllPedidos();
+
+        if (dados.size() > 0){
+            for (Pedido pedido : dados) {
+                String idPed = String.valueOf(pedido.getIdPedido());
+                String precoProduto = String.valueOf(pedido.getPreco());
+                String qtde = String.valueOf(pedido.getQuantidade());
+                String ttl = String.valueOf(pedido.getTotal());
+                String mes = String.valueOf(pedido.getMesa());
+
+                String stringPedido = "Ped: " + idPed + " / Preço: " + precoProduto + " Qtde: " + qtde + "Total: " + ttl;
+
+                arrayRetorno.add(stringPedido);
+            }
+        } else {
+            Toast.makeText(getApplicationContext(), "Nenhum Pedido foi encontrado!", Toast.LENGTH_LONG).show();
+        }
+
+        return arrayRetorno;
     }
 
     @Override
@@ -43,8 +125,10 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_cadastra_produtos){
+            startActivity(new Intent(MainActivity.this, CadastroProdutoActivity.class));
+        }else if (id == R.id.action_cadastra_pedido){
+            startActivity(new Intent(MainActivity.this, CadastroPedidoActivity.class));
         }
 
         return super.onOptionsItemSelected(item);
