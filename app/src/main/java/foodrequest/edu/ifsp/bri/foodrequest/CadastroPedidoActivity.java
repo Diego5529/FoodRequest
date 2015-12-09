@@ -36,19 +36,31 @@ public class CadastroPedidoActivity extends AppCompatActivity {
         txtTotal = (TextView) findViewById(R.id.textViewTotal);
 
         if (getIntent().getExtras() != null){
-            setDadosProdutoCarregado(getIntent().getExtras());
+            Bundle b = getIntent().getExtras();
+            int idProduto = 0;
+            try {
+                idProduto = b.getInt("id_produto");
+            } catch (NumberFormatException e) {
+            }
+            if (idProduto > 0) {
+                setDadosProdutoCarregado(idProduto);
+            }
+
+            int idPedido = 0;
+            try {
+                idPedido = b.getInt("id_pedido");
+            } catch (NumberFormatException e) {
+
+            }
+            if (idPedido > 0){
+                edtIDPedido.setText(String.valueOf(idPedido));
+                buscaPedido();
+            }
         }
     }
 
-    public void setDadosProdutoCarregado(Bundle b)
+    public void setDadosProdutoCarregado(int idProduto)
     {
-        int idProduto = 0;
-
-        try {
-            idProduto = b.getInt("id_produto");
-        } catch (NumberFormatException e) {
-        }
-
         if (idProduto > 0) {
 
             DBController crud = new DBController(getBaseContext());
@@ -119,6 +131,10 @@ public class CadastroPedidoActivity extends AppCompatActivity {
     }
 
     public void consultaPedido(View view){
+        buscaPedido();
+    }
+
+    public void buscaPedido(){
         DBController crud = new DBController(getBaseContext());
 
         int id = 0;
@@ -143,6 +159,8 @@ public class CadastroPedidoActivity extends AppCompatActivity {
                 edtQuantidade.setText(String.valueOf(quantidade));
                 txtTotal.setText(String.format("R$ %.2f", total));
                 edtMesa.setText(String.valueOf(mesa));
+
+                setDadosProdutoCarregado(idProduto);
             } else {
                 Toast.makeText(getApplicationContext(), "Pedido não encontrado!", Toast.LENGTH_LONG).show();
             }

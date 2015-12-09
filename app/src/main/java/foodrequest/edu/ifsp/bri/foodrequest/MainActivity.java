@@ -42,11 +42,24 @@ public class MainActivity extends AppCompatActivity {
 
         lista.setOnItemClickListener(new OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Intent i = new Intent(ClassName.this,CourtDetailActivity.class);
-                //startActivity(i);
+                id = id + 1;
+                if (id > 0) {
+                    String stringID = String.valueOf(id);
+                    Intent intent = new Intent(MainActivity.this, CadastroPedidoActivity.class);
+                    Bundle b = new Bundle();
+                    b.putInt("id_pedido", Integer.parseInt(stringID));
+                    intent.putExtras(b);
+
+                    startActivity(intent);
+                }
+
                 Toast.makeText(getApplicationContext(), "Pedido:" + equpes.get(position).toString(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void reloadListView(View view){
+        carregaLista();
     }
 
     protected void  onResume(Bundle saveInstanceState){

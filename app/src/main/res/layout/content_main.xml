@@ -25,7 +25,16 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/listViewPedidos"
-        android:layout_below="@+id/textView3"
         android:layout_alignParentEnd="true"
-        android:choiceMode="singleChoice" />
+        android:choiceMode="singleChoice"
+        android:layout_below="@+id/buttonReload" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Recarregar"
+        android:id="@+id/buttonReload"
+        android:onClick="reloadListView"
+        android:layout_below="@+id/textView3"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>
